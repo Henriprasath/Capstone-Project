@@ -1,100 +1,99 @@
 # Exercise-14-Capstone-Project
-# Capstone Project - Personal Finance Categorization and Summary Automation
+# Automated Certificate Generation using UiPath
 ## Aim
-To automate the process of reading personal transaction data from a CSV file, categorizing expenses into various groups (Food, Transport, Bills, Others), and generating a summary report with total amounts and current date in an Excel file using UiPath.
+Automatically generate personalized certificates for participants by reading a CSV file and filling a certificate template (Word or PowerPoint), then saving each certificate as PDF (and optionally emailing or zipping them).
 
 ## Materials Required
-UiPath Studio (Community/Enterprise Edition)
-Windows OS
-Input transaction file (CSV format)
-Basic knowledge of UiPath:
-Read CSV
-For Each Row
-If Condition
-Dictionary & Variables
-Add Data Row
-Write CSV
+1) UiPath Studio (Community/Enterprise)
+2) Windows OS
+3) Certificate template (Word .docx or PowerPoint .pptx) with clear placeholders (e.g., {{Name}}, {{Course}}, {{Date}}, {{Grade}})
+4) Input CSV file (participants.csv)
+5) Basic UiPath knowledge:
+6) Read CSV / Read Range
+7) Word/PowerPoint activities (Word Application Scope / PowerPoint activities or use “Word Application Scope” + “Replace Text”)
+8) Save As / Export to PDF / Save Presentation As
+9) Send SMTP Mail Message or Outlook Mail Message (optional)
+10) Invoke VBA (optional)
+11) System.IO for file operations
 
-## Procedure
+## Input (CSV example)
 
-Step 1: Prepare Input File
-  Create a CSV file named transactions.csv
-  Columns: Date, Description, Amount
-  Example:
-  ~~~
-  2025-05-21, TNEB Online Payment, 600
-  2025-05-21, Swiggy Order, 250
-  ~~~
+Create participants.csv with columns:
+```
+Name,Course,Date,Grade,Email
+Asha Kumar,Deep Learning Basics,24-11-2025,Distinction,asha@example.com
+Ramesh Iyer,Deep Learning Basics,24-11-2025,Merit,ramesh@example.com
+```
 
-Step 2: Build Category Logic
-  Read the CSV file using Read CSV → Output: dtTransactions.
-  Create a Dictionary variable:
-  Name: categoryTotals
-  Type: Dictionary<String, Double>
-  Default value:
-  ~~~
-  New Dictionary(Of String, Double) From {
-     {"Food", 0},
-     {"Transport", 0},
-     {"Bills", 0},
-     {"Others", 0}
-  }
-  ~~~
-  Loop through each row in dtTransactions with For Each Row.
-  
-  Inside the loop:
-  
-  Assign: desc = row("Description").ToString.ToLower
-  
-  Assign: amount = Convert.ToDouble(row("Amount").ToString)
-  
-  Use If conditions to match descriptions:
-  
-  If desc.Contains("swiggy") Or desc.Contains("zomato") Or desc.Contains("food")
-      → categoryTotals("Food") += amount
-  
-  ElseIf desc.Contains("uber") Or desc.Contains("ola") Or desc.Contains("bus") Or desc.Contains("train")
-      → categoryTotals("Transport") += amount
-  
-  ElseIf desc.Contains("tneb") Or desc.Contains("recharge") Or desc.Contains("bill")
-      → categoryTotals("Bills") += amount
-  
-  Else
-      → categoryTotals("Others") += amount
-  📊 Step 3: Create a Summary Table
-  Add Build Data Table activity → Name it dtSummary
-  
-  Columns: Category (String), Total (Double), Date (String)
-  
-  Use For Each item In categoryTotals
-  
-  Add Data Row:
-  ~~~
-  { item.Key, item.Value, Now.ToString("dd-MM-yyyy") }
-  📤 Step 4: Write Output
-  Use Write CSV activity
-  ~~~
+## Template Requirements
+
+Word template (certificate_template.docx) or PowerPoint template (certificate_template.pptx)
+
+Placeholders must be unique and easy to locate. Use double braces, e.g. {{Name}}, {{Course}}, {{Date}}, {{Grade}}.
+
+For Word: placeholders in normal text or content controls. For PowerPoint: placeholders inside textboxes.
+
+## Overall Workflow (high-level)
+
+Read CSV → dtParticipants
+
+For Each row In dtParticipants
+
+Set variables: name, course, date, grade, email
+
+Copy template to a working file (e.g., temp_certificate_{Name}.docx / .pptx)
+
+Open the working file and replace placeholders with values
+
+Save / Export working file as PDF (certificate_{Name}.pdf)
+
+(Optional) Attach & send email or move to folder / zip
+
+End
+
+## Detailed UiPath Sequence (Word-based preferred approach)
+# Variables (suggested)
+
+dtParticipants — DataTable
+
+row — DataRow
+
+name — String
+
+course — String
+
+certDate — String
+
+grade — String
+
+email — String
+
+templatePath — String → "C:\Templates\certificate_template.docx"
+
+outputFolder — String → "C:\Certificates\"
+
+tempDocPath — String
+
+pdfPath — String
 
 # Sequence :
-![Screenshot 2025-05-24 214511](https://github.com/user-attachments/assets/f6805393-1bf2-4969-9b41-8e16190a8f9a)
 
-![Screenshot 2025-05-24 214524](https://github.com/user-attachments/assets/4c081d6a-a646-4be7-a0ec-0b1acd4e5d2c)
+<img width="899" height="497" alt="image" src="https://github.com/user-attachments/assets/d52c0489-b1f3-41aa-a851-eea82493da30" />
 
-![Screenshot 2025-05-24 214531](https://github.com/user-attachments/assets/d8dcdece-f510-4976-88fb-6ad91573dbf7)
+<img width="843" height="564" alt="image" src="https://github.com/user-attachments/assets/6fae79c8-a2de-4f63-99ff-d3a8f1085d03" />
 
-![Screenshot 2025-05-24 214540](https://github.com/user-attachments/assets/c5d5acbb-9857-4150-b64b-bb5cbdb9f3ec)
-
-![Screenshot 2025-05-24 214549](https://github.com/user-attachments/assets/c1204893-5e98-4da3-b96c-16d8e8cea658)
-
-![Screenshot 2025-05-24 214600](https://github.com/user-attachments/assets/e123ffb2-caea-4ec5-af27-e55466d01e6b)
+<img width="875" height="652" alt="image" src="https://github.com/user-attachments/assets/9200a2bd-e222-4bb3-a298-56ebf0e18214" />
 
 
 # Input:
-![Screenshot 2025-05-24 214636](https://github.com/user-attachments/assets/2119e283-bd32-4ef8-bfc7-01e8c3034a12)
+
+<img width="1912" height="1063" alt="image" src="https://github.com/user-attachments/assets/6be682cc-548c-4ee4-85ee-3acbf6dad7f7" />
+
 
 # Output :
-![Screenshot 2025-05-24 214645](https://github.com/user-attachments/assets/a4f6940b-24ad-4e17-95c6-9799fc3dd69f)
 
+<img width="922" height="710" alt="image" src="https://github.com/user-attachments/assets/df2c725c-9ef4-4e06-bd67-d8f56059d20c" />
 
 # Result :
-The workflow successfully categorizes transaction data based on their description into 4 groups and generates a daily summary in a structured CSV file with date tracking.
+
+The UiPath workflow successfully reads the list of participants from a CSV file, replaces the template placeholders with personalized details, and automatically generates individual certificates for each participant in PDF/Word format. This automation eliminates manual editing work, ensures accuracy and consistency, and produces certificates efficiently for any number of students.
